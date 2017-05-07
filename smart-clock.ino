@@ -1,3 +1,14 @@
+// Smart Clock 
+/*
+	Copyright 2017 Bartosz Kupiec
+	Can be used by anyone, only for non-commerical use.
+	
+	This code has been made to work with an Arduino Nano using ATmega 328.
+*/
+
+
+
+
 //Libraries
 #include <IRremote.h>
 #include <Wire.h>
