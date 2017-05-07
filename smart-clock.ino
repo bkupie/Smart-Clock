@@ -20,33 +20,29 @@
 #include <TimeLib.h>
 
 //Constants
-#define DHTPIN 2     // what pin we're connected to
-#define DHTTYPE DHT22   // DHT 22  (AM2302)
-DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
+#define DHTPIN 2          // what pin we're connected to
+#define DHTTYPE DHT22     // DHT 22  (AM2302)
+DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor for normal 16mhz Arduino
 
 
 //Variables
 int chk;
-float hum;  //Stores humidity value
-float temp; //Stores temperature value 
-int RECV_PIN = 4;
+float hum;  		  //Stores humidity value
+float temp; 		  //Stores temperature value 
+int RECV_PIN = 4;	  // receving pin for the remote
 int incomingByte = 0; // used when getting input 
-bool toDisplay;
-bool screenOn;
+bool toDisplay;		  // specifies what should be displayed 
+bool screenOn;		  // keeps the state of the LCD backlight, on or off 
+IRrecv irrecv(RECV_PIN); // initalize reciever 
+decode_results results;  // storage for the remote results 
 //Hex values for remote
 unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
 unsigned long btn_4 = 0xFF10EF;unsigned long btn_5 = 0xFF38C7;unsigned long btn_6 = 0xFF5AA5;
+unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;
 
 int led_red = 11;
 int led_green = 10;
 int led_blue = 9;
-
-unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;
-
-IRrecv irrecv(RECV_PIN);
-
-decode_results results;
-
 
 #define I2C_ADDR 0x27
 #define BACKLIGHT_PIN 3
@@ -97,25 +93,26 @@ void decodeRemote()
      toDisplay = !toDisplay;
  else if(results.value == btn_2) // pressed 2
      digitalWrite(led_red, HIGH);
-  else if(results.value == btn_3) // pressed 3
+ else if(results.value == btn_3) // pressed 3
       digitalWrite(led_green, HIGH);
-  else if(results.value == btn_4) // pressed 4
+ else if(results.value == btn_4) // pressed 4
       digitalWrite(led_blue, HIGH);   
-  else if(results.value == btn_5) // pressed 5
+ else if(results.value == btn_5) // pressed 5
       {
       digitalWrite(led_red, LOW);    
       digitalWrite(led_blue, LOW);    
       digitalWrite(led_green, LOW);    
       }
-  else if(results.value == btn_minus) // pressed - 
-  {  screenOn = !screenOn;
+ else if(results.value == btn_minus) // pressed - 
+	{  
+	 screenOn = !screenOn; // turn screen from on-> off or off -> on 
      if(screenOn == true)
         lcd.setBacklight(HIGH);
      else
         lcd.setBacklight(LOW);
   }
   else if(results.value == btn_plus) // pressed + 
-     lcd.setBacklight(HIGH);
+     lcd.setBacklight(HIGH);    // for now always set high 
      
 
 }
@@ -124,8 +121,8 @@ void getRemoteInput()
 {
    if (irrecv.decode(&results)) {
    lcd.clear();    // clear screen 
-   lcd.print(results.value,HEX);
-   // delay(4000); // used to figure out codes, comment out to cancel delay 
+   // lcd.print(results.value,HEX); // print out the code . . .
+   // delay(4000); 					// then delay to find out the values, DEBUG ONLY 
    decodeRemote(); // decode output 
    irrecv.resume(); // Receive the next value
   }
