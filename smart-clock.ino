@@ -14,7 +14,7 @@
 #include <Wire.h>
 #include <LCD.h>
 #include <LiquidCrystal_I2C.h>
-#include <DHT.h>;
+#include <DHT.h>
 #include <limits.h>
 #include <Time.h>
 #include <TimeLib.h>
@@ -22,7 +22,7 @@
 //Constants
 #define BUZZERPIN 6       // pin for the buzzer 
 #define DHTPIN 2          // pin for the temp/humidity sensor 
-#define RECV_PIN 4	  // receving pin for the remote
+#define RECV_PIN 4	      // receving pin for the remote
 #define DHTTYPE DHT22     // DHT 22  (AM2302)
 
 //Constants for LCD 
@@ -67,15 +67,16 @@ void setOurTime() // for now a fixed value
  setTime(4,20,00,5,9,2017);
 }
 
-void screenTimer()
+void screenTimer()	// turn the screen on for a limited amount of time 
 {
-  unsigned long currentMillis = millis(); 
+  unsigned long currentMillis = millis();  // get current time 
   if(screenOn && currentMillis - previousMillis >= onTime)
   {   
-      lcd.setBacklight(LOW);
-	  previousMillis = currentMillis;
-	  screenOn = false;
-	  lcd.clear();
+	  // if our screen is on, and timer is expired, turn screen off 
+      lcd.clear();						// clear the screen 
+	  lcd.setBacklight(LOW);			// turn backlight off  
+	  previousMillis = currentMillis;   // reset the timer for future use 
+	  screenOn = false; 				// change state to being off 
   }
 	
 }
@@ -140,6 +141,22 @@ void decodeRemote()
       digitalWrite(led_blue, LOW);    
       digitalWrite(led_green, LOW);    
       }
+else if(results.value == btn_6) // pressed 5
+      {
+		analogWrite(BUZZERPIN,100);
+		delay(1000);
+		analogWrite(BUZZERPIN,0);
+		delay(1000);
+		analogWrite(BUZZERPIN,100);
+		delay(1000);
+		analogWrite(BUZZERPIN,0);
+		delay(1000);
+		analogWrite(BUZZERPIN,100);
+		delay(1000);
+		analogWrite(BUZZERPIN,0);
+		delay(1000);
+        
+      }
  else if(results.value == btn_minus) // pressed - 
 	{  
 	 screenOn = !screenOn; // turn screen from on-> off or off -> on 
@@ -170,7 +187,9 @@ void getRemoteInput()
 
 void setup()
 { 
-  pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT);
+  pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT); 
+  pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
+  //noTone(BUZZERPIN);						   // make sure it doesn't make any noises 
   setOurTime();								   // set initial time 
   screenOn = false;							   // when starting, make LED backlight off 
   dht.begin();                                 // set up temp monitor 
