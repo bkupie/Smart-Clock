@@ -20,31 +20,12 @@
 #include <TimeLib.h>
 
 //Constants
-#define DHTPIN 2          // what pin we're connected to
+#define BUZZERPIN 6       // pin for the buzzer 
+#define DHTPIN 2          // pin for the temp/humidity sensor 
+#define RECV_PIN 4	  // receving pin for the remote
 #define DHTTYPE DHT22     // DHT 22  (AM2302)
-DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor for normal 16mhz Arduino
 
-
-//Variables
-int chk;
-unsigned long previousMillis = 0; // store previous millis value
-long onTime = 5000;      
-float hum;  		  //Stores humidity value
-float temp; 		  //Stores temperature value 
-int RECV_PIN = 4;	  // receving pin for the remote
-int incomingByte = 0; // used when getting input 
-bool screenOn;		     // keeps the state of the LCD backlight, on or off 
-IRrecv irrecv(RECV_PIN); // initalize reciever 
-decode_results results;  // storage for the remote results 
-//Hex values for remote
-unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
-unsigned long btn_4 = 0xFF10EF;unsigned long btn_5 = 0xFF38C7;unsigned long btn_6 = 0xFF5AA5;
-unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;
-
-int led_red = 11;
-int led_green = 10;
-int led_blue = 9;
-
+//Constants for LCD 
 #define I2C_ADDR 0x27
 #define BACKLIGHT_PIN 3
 #define DHTPIN 2
@@ -55,6 +36,29 @@ int led_blue = 9;
 #define D5_pin 5
 #define D6_pin 6
 #define D7_pin 7
+ 
+DHT dht(DHTPIN, DHTTYPE); // initialize DHT sensor for normal 16mhz Arduino
+IRrecv irrecv(RECV_PIN);  // initalize reciever 
+decode_results results;   // storage for the remote results 
+
+//Variables
+unsigned long previousMillis = 0; // store previous millis value
+long onTime = 5000;   //determines how long the screen should be turned on for    
+float hum;  		  // store humidity value
+float temp; 		  // store temperature value 
+int incomingByte = 0; // used when getting input 
+bool screenOn;		  // keeps the state of the LCD backlight, on or off 
+
+//Hex values for remote
+unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
+unsigned long btn_4 = 0xFF10EF;unsigned long btn_5 = 0xFF38C7;unsigned long btn_6 = 0xFF5AA5;
+unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;
+
+int led_red = 11;
+int led_green = 10;
+int led_blue = 9;
+
+
 
 LiquidCrystal_I2C lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 
