@@ -172,7 +172,7 @@ void setup()
   dht.begin();                                 // set up temp monitor 
   lcd.begin (20,4,LCD_5x8DOTS);                // set up LCD  
   lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // set up backlight pin
-  lcd.setBacklight(HIGH);  lcd.home ();        // turn on LED screen, and set to home 
+  lcd.setBacklight(LOW);  lcd.home ();        // turn off LED screen, and set to home 
   while (!Serial);                             //delay for serial
   irrecv.enableIRIn();                         // Start the receiver
   Serial.begin(9600);                          // Begin serial communcation, used for input 
