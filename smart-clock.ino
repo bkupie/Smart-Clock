@@ -27,7 +27,8 @@ DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor for normal 16mhz Arduino
 
 //Variables
 int chk;
-unsigned long previousMillis = 0; // store previous millis value 
+unsigned long previousMillis = 0; // store previous millis value
+long onTime = 5000;      
 float hum;  		  //Stores humidity value
 float temp; 		  //Stores temperature value 
 int RECV_PIN = 4;	  // receving pin for the remote
@@ -108,7 +109,10 @@ void decodeRemote()
 	{  
 	 screenOn = !screenOn; // turn screen from on-> off or off -> on 
      if(screenOn == true)
+	 {
+		previousMillis = millis(); 
         lcd.setBacklight(HIGH);
+	 }
      else
         lcd.setBacklight(LOW);
   }
@@ -146,7 +150,14 @@ void setup()
 
 void loop()
 {
-  unsigned long currentMillis = millis();  
+
+  unsigned long currentMillis = millis(); 
+  if(screenOn && currentMillis - previousMillis >= onTime)
+  {   
+      lcd.setBacklight(LOW);
+	  previousMillis = currentMillis;
+	  screenOn = false;
+  }
   getRemoteInput();
   if(toDisplay)
   displayTime();
