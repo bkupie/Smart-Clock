@@ -16,8 +16,9 @@
 #include <LiquidCrystal_I2C.h>
 #include <DHT.h>
 #include <limits.h>
-#include <Time.h>
-#include <TimeLib.h>
+#include "Sodaq_DS3231.h"
+
+
 
 //Constants
 #define BUZZERPIN 6       // pin for the buzzer 
@@ -42,12 +43,15 @@ IRrecv irrecv(RECV_PIN);  // initalize reciever
 decode_results results;   // storage for the remote results 
 
 //Variables
+char weekDay[][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+uint32_t old_ts;
 unsigned long previousMillis = 0; // store previous millis value
 long onTime = 5000;   //determines how long the screen should be turned on for    
 float hum;  		  // store humidity value
 float temp; 		  // store temperature value 
 int incomingByte = 0; // used when getting input 
 bool screenOn;		  // keeps the state of the LCD backlight, on or off 
+
 
 //Hex values for remote
 unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
@@ -62,10 +66,6 @@ int led_blue = 9;
 
 LiquidCrystal_I2C lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 
-void setOurTime() // for now a fixed value 
-{
- setTime(4,20,00,5,9,2017);
-}
 
 void screenTimer()	// turn the screen on for a limited amount of time 
 {
@@ -84,14 +84,37 @@ void screenTimer()	// turn the screen on for a limited amount of time
 
 void displayTime() // display the time and date on the LCD screen 
 {
-lcd.clear();
-// Print a message to the LCD.
-lcd.print("Date ");lcd.print(month());lcd.print("/");lcd.print(day());lcd.print("/");lcd.print(year());
-lcd.setCursor(0,1);         // set the cursor to the next line on our LCD ( line 2 )
-lcd.print("Time ");lcd.print(hour());lcd.print(":");lcd.print(minute());lcd.print(":");lcd.print(second());
-lcd.setCursor(0,0);         // set the cursor to the previous line on our LCD ( line 1 )
-delay(250);
-  
+
+DateTime now = rtc.now(); //get the current date-time
+    uint32_t ts = now.getEpoch();
+  lcd.clear();
+    if (old_ts == 0 || old_ts != ts) {
+  old_ts = ts;
+  lcd.print("Date: ");
+  lcd.print(now.year(), DEC);
+  lcd.print('/');
+  lcd.print(now.month(), DEC);
+  lcd.print('/');
+  lcd.print(now.date(), DEC);
+  lcd.print(' ');
+  lcd.setCursor(0,1);
+  lcd.print("Time: ");
+  lcd.print(now.hour(), DEC);
+  lcd.print(':');
+  lcd.print(now.minute(), DEC);
+  lcd.print(':');
+  lcd.print(now.second(), DEC);
+  lcd.print(' ');
+  lcd.setCursor(0,2);
+  lcd.print("Day : ");
+  lcd.print(weekDay[now.dayOfWeek()]);
+
+    
+  //lcd.print("Seconds since Unix Epoch: "); 
+  //lcd.print(ts, DEC);
+    }
+    delay(1000);
+
 }
 
 
@@ -99,10 +122,12 @@ void displayTemp()
 { 
     hum = dht.readHumidity();
     temp= dht.readTemperature();
+	rtc.convertTemperature();             //convert current temperature into registers
     //Print temp and humidity values to lcd
     lcd.print("Humidity: ");lcd.print(hum);lcd.print(" %");
     lcd.setCursor(0,1);lcd.print("Temp:     ");lcd.print((temp*9/5) + 32);lcd.print(" F");
-    lcd.setCursor(10,2);lcd.print(temp);lcd.print(" C"); 
+    lcd.setCursor(0,2);lcd.print("Sensor 1: ");lcd.print(temp);lcd.print(" C"); 
+	lcd.setCursor(0,3);lcd.print("Sensor 2: ");lcd.print(rtc.getTemperature());lcd.print(" C");  //read registers and display the temperature
     lcd.setCursor(0,0);         // set the cursor to the previous line on our LCD ( line 1 )
 }
 
@@ -187,15 +212,15 @@ void getRemoteInput()
 
 void setup()
 { 
+  Wire.begin();
+  rtc.begin();
   pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT); 
   pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
-  //noTone(BUZZERPIN);						   // make sure it doesn't make any noises 
-  setOurTime();								   // set initial time 
   screenOn = false;							   // when starting, make LED backlight off 
   dht.begin();                                 // set up temp monitor 
   lcd.begin (20,4,LCD_5x8DOTS);                // set up LCD  
   lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // set up backlight pin
-  lcd.setBacklight(LOW);  lcd.home ();        // turn off LED screen, and set to home 
+  lcd.setBacklight(HIGH);  lcd.home ();        // turn off LED screen, and set to home 
   while (!Serial);                             //delay for serial
   irrecv.enableIRIn();                         // Start the receiver
   Serial.begin(9600);                          // Begin serial communcation, used for input 
@@ -205,4 +230,5 @@ void loop()
 {
   getRemoteInput();
   screenTimer();
+  displayTime();
 }
