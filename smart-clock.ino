@@ -86,35 +86,18 @@ void displayTime() // display the time and date on the LCD screen
 {
 
 DateTime now = rtc.now(); //get the current date-time
-    uint32_t ts = now.getEpoch();
+  uint32_t ts = now.getEpoch();
   lcd.clear();
-    if (old_ts == 0 || old_ts != ts) {
-  old_ts = ts;
-  lcd.print("Date: ");
-  lcd.print(now.year(), DEC);
-  lcd.print('/');
-  lcd.print(now.month(), DEC);
-  lcd.print('/');
-  lcd.print(now.date(), DEC);
-  lcd.print(' ');
-  lcd.setCursor(0,1);
-  lcd.print("Time: ");
-  lcd.print(now.hour(), DEC);
-  lcd.print(':');
-  lcd.print(now.minute(), DEC);
-  lcd.print(':');
-  lcd.print(now.second(), DEC);
-  lcd.print(' ');
-  lcd.setCursor(0,2);
-  lcd.print("Day : ");
-  lcd.print(weekDay[now.dayOfWeek()]);
-
-    
-  //lcd.print("Seconds since Unix Epoch: "); 
-  //lcd.print(ts, DEC);
-    }
+  if (old_ts == 0 || old_ts != ts) {
+	  old_ts = ts;
+	  // print the current date:
+	  lcd.setCursor(0,0);lcd.print("Date: ");lcd.print(now.month(), DEC);lcd.print('/');lcd.print(now.date(), DEC);lcd.print('/');lcd.print(now.year(), DEC);
+	  // print the current time:
+	  lcd.setCursor(0,1);lcd.print("Time: ");lcd.print(now.hour(), DEC);lcd.print(':');lcd.print(now.minute(), DEC);lcd.print(':');lcd.print(now.second(), DEC);
+	  // print the day of the week:
+	  lcd.setCursor(0,2);lcd.print("Day : "); lcd.print(weekDay[now.dayOfWeek()]);
+  }
     delay(1000);
-
 }
 
 
