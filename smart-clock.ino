@@ -33,8 +33,7 @@ float hum;  		  //Stores humidity value
 float temp; 		  //Stores temperature value 
 int RECV_PIN = 4;	  // receving pin for the remote
 int incomingByte = 0; // used when getting input 
-bool toDisplay;		  // specifies what should be displayed 
-bool screenOn;		  // keeps the state of the LCD backlight, on or off 
+bool screenOn;		     // keeps the state of the LCD backlight, on or off 
 IRrecv irrecv(RECV_PIN); // initalize reciever 
 decode_results results;  // storage for the remote results 
 //Hex values for remote
@@ -59,10 +58,24 @@ int led_blue = 9;
 
 LiquidCrystal_I2C lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 
-void setOurTime()
+void setOurTime() // for now a fixed value 
 {
- setTime(4,20,00,5,4,2017);
+ setTime(4,20,00,5,9,2017);
 }
+
+void screenTimer()
+{
+  unsigned long currentMillis = millis(); 
+  if(screenOn && currentMillis - previousMillis >= onTime)
+  {   
+      lcd.setBacklight(LOW);
+	  previousMillis = currentMillis;
+	  screenOn = false;
+	  lcd.clear();
+  }
+	
+}
+
 
 void displayTime() // display the time and date on the LCD screen 
 {
@@ -77,7 +90,7 @@ delay(250);
 }
 
 
-void printTemp()
+void displayTemp()
 { 
     hum = dht.readHumidity();
     temp= dht.readTemperature();
@@ -92,9 +105,27 @@ void decodeRemote()
 {
   
  if(results.value == btn_1) // pressed 1
-     toDisplay = !toDisplay;
+	{
+	lcd.setBacklight(HIGH);	
+    screenOn = true;
+	previousMillis = millis(); 
+	while(screenOn)
+	{
+		screenTimer();
+		displayTime();
+	}
+	}	
  else if(results.value == btn_2) // pressed 2
-     digitalWrite(led_red, HIGH);
+    {
+	lcd.setBacklight(HIGH);	
+    screenOn = true;
+	previousMillis = millis(); 
+	while(screenOn)
+	{
+		screenTimer();
+		displayTemp();
+	}
+	}	
  else if(results.value == btn_3) // pressed 3
       digitalWrite(led_green, HIGH);
  else if(results.value == btn_4) // pressed 4
@@ -137,8 +168,7 @@ void setup()
 { 
   pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT);
   setOurTime();								   // set initial time 
-  toDisplay = false;						   // when first turned on display temp 
-  screenOn = true;							   // when starting, make LED backlight on 
+  screenOn = false;							   // when starting, make LED backlight off 
   dht.begin();                                 // set up temp monitor 
   lcd.begin (20,4,LCD_5x8DOTS);                // set up LCD  
   lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // set up backlight pin
@@ -150,17 +180,6 @@ void setup()
 
 void loop()
 {
-
-  unsigned long currentMillis = millis(); 
-  if(screenOn && currentMillis - previousMillis >= onTime)
-  {   
-      lcd.setBacklight(LOW);
-	  previousMillis = currentMillis;
-	  screenOn = false;
-  }
   getRemoteInput();
-  if(toDisplay)
-  displayTime();
-  else
-  printTemp();
+  screenTimer();
 }
