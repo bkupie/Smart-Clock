@@ -46,11 +46,20 @@ decode_results results;   // storage for the remote results
 char weekDay[][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 uint32_t old_ts;
 unsigned long previousMillis = 0; // store previous millis value
-long onTime = 5000;   //determines how long the screen should be turned on for    
+long onTime = 10000;   //determines how long the screen should be turned on for    
 float hum;  		  // store humidity value
 float temp; 		  // store temperature value 
 int incomingByte = 0; // used when getting input 
 bool screenOn;		  // keeps the state of the LCD backlight, on or off 
+
+typedef struct myAlarm{
+int hour;
+int minute;
+int second;
+bool on;
+}myAlarm;
+
+struct myAlarm alarm;
 
 
 //Hex values for remote
@@ -82,14 +91,36 @@ void screenTimer()	// turn the screen on for a limited amount of time
 }
 
 
+
+void alarmNoise()
+{
+		lcd.clear();
+		lcd.setBacklight(HIGH); // just incase the screen is turned off, which it should be 
+	  lcd.setCursor(0,0);lcd.print("+-----------------+");
+	  lcd.setCursor(0,1);lcd.print("|     WAKE UP     |");
+	  lcd.setCursor(0,2);lcd.print("|   IT'S  "); lcd.print(alarm.hour); lcd.print(":");lcd.print(alarm.minute);lcd.print("   |");
+	  lcd.setCursor(0,3);lcd.print("+-----------------+");
+        analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
+		delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
+		delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
+		delay(1000);
+		lcd.setBacklight(LOW);		
+}
+
+
 void displayTime() // display the time and date on the LCD screen 
 {
 
-DateTime now = rtc.now(); //get the current date-time
+  DateTime now = rtc.now(); //get the current date-time
   uint32_t ts = now.getEpoch();
-  lcd.clear();
+  
   if (old_ts == 0 || old_ts != ts) {
 	  old_ts = ts;
+	   if (alarm.hour == now.hour() && alarm.minute == now.minute() && alarm.second == now.second() )
+	   {
+		alarmNoise();
+	   }
+	  lcd.clear();
 	  // print the current date:
 	  lcd.setCursor(0,0);lcd.print("Date: ");lcd.print(now.month(), DEC);lcd.print('/');lcd.print(now.date(), DEC);lcd.print('/');lcd.print(now.year(), DEC);
 	  // print the current time:
@@ -97,7 +128,7 @@ DateTime now = rtc.now(); //get the current date-time
 	  // print the day of the week:
 	  lcd.setCursor(0,2);lcd.print("Day : "); lcd.print(weekDay[now.dayOfWeek()]);
   }
-    delay(1000);
+  delay(50);
 }
 
 
@@ -140,9 +171,13 @@ void decodeRemote()
 	}
 	}	
  else if(results.value == btn_3) // pressed 3
-      digitalWrite(led_green, HIGH);
+	  {
+		  alarmNoise();
+	  }
  else if(results.value == btn_4) // pressed 4
-      digitalWrite(led_blue, HIGH);   
+ {
+	 
+ }
  else if(results.value == btn_5) // pressed 5
       {
       digitalWrite(led_red, LOW);    
@@ -151,19 +186,7 @@ void decodeRemote()
       }
 else if(results.value == btn_6) // pressed 5
       {
-		analogWrite(BUZZERPIN,100);
-		delay(1000);
-		analogWrite(BUZZERPIN,0);
-		delay(1000);
-		analogWrite(BUZZERPIN,100);
-		delay(1000);
-		analogWrite(BUZZERPIN,0);
-		delay(1000);
-		analogWrite(BUZZERPIN,100);
-		delay(1000);
-		analogWrite(BUZZERPIN,0);
-		delay(1000);
-        
+		alarmNoise();  
       }
  else if(results.value == btn_minus) // pressed - 
 	{  
@@ -195,15 +218,15 @@ void getRemoteInput()
 
 void setup()
 { 
-  Wire.begin();
-  rtc.begin();
+  alarm.on = true; alarm.hour = 19; alarm.minute = 50; alarm.second = 00;
+  Wire.begin(); rtc.begin();
   pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT); 
   pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
   screenOn = false;							   // when starting, make LED backlight off 
   dht.begin();                                 // set up temp monitor 
   lcd.begin (20,4,LCD_5x8DOTS);                // set up LCD  
   lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // set up backlight pin
-  lcd.setBacklight(HIGH);  lcd.home ();        // turn off LED screen, and set to home 
+  lcd.setBacklight(LOW);  lcd.home ();        // turn off LED screen, and set to home 
   while (!Serial);                             //delay for serial
   irrecv.enableIRIn();                         // Start the receiver
   Serial.begin(9600);                          // Begin serial communcation, used for input 
@@ -212,6 +235,7 @@ void setup()
 void loop()
 {
   getRemoteInput();
-  screenTimer();
+  //screenTimer();
   displayTime();
 }
+
