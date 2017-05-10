@@ -101,8 +101,8 @@ void alarmOff() { alarm.on = false; }
 
 void alarmNoise()
 {
-		lcd.clear();
-		lcd.setBacklight(HIGH); // just incase the screen is turned off, which it should be 
+	  lcd.clear();
+	  lcd.setBacklight(HIGH); // just incase the screen is turned off, which it should be 
 	  lcd.setCursor(0,0);lcd.print("+-----------------+");
 	  lcd.setCursor(0,1);lcd.print("|     WAKE UP     |");
 	  lcd.setCursor(0,2);lcd.print("|   IT'S  "); lcd.print(alarm.hour); lcd.print(":");lcd.print(alarm.minute);lcd.print("   |");
@@ -114,6 +114,11 @@ void alarmNoise()
 		lcd.setBacklight(LOW);		
 }
 
+void timeSet(int year, int month,int day, int hr, int min, int sec, int day)
+{
+	DateTime newTime(year,month,day,hour,min,sec,day);  // make variable to store the time 
+	rtc.setDateTime(newTime); 							// adjust date-time as defined 'newTime' above 
+}
 
 void displayTime() // display the time and date on the LCD screen 
 {
