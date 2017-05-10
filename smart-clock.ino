@@ -90,7 +90,14 @@ void screenTimer()	// turn the screen on for a limited amount of time
 	
 }
 
-
+void alarmSet(int hr,int min,int sec)
+{
+	alarm.hour = hr;
+	alarm.minute = min;
+	alarm.second = sec;
+}
+void alarmOn()  { alarm.on = true;  }
+void alarmOff() { alarm.on = false; }
 
 void alarmNoise()
 {
@@ -220,7 +227,7 @@ void getRemoteInput()
 
 void setup()
 { 
-  alarm.on = true; alarm.hour = 6; alarm.minute = 00; alarm.second = 00;
+  alarmOn(); alarmSet(6,0,0); // default alarm at 6 am 
   Wire.begin(); rtc.begin();
   pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT); 
   pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
