@@ -63,19 +63,11 @@ struct myAlarm alarm;
 
 
 //Hex values for remote
-
-unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;unsigned long btn_eq = 0xFF906F;
-unsigned long btn_0 = 0xFF30CF;unsigned long btn_100_plus = 0xFF9867;unsigned long btn_200_plus = 0xFFB04F;
-unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
-unsigned long btn_4 = 0xFF10EF;unsigned long btn_5 = 0xFF38C7;unsigned long btn_6 = 0xFF5AA5;
-unsigned long btn_7 = 0xFF42BD;unsigned long btn_8 = 0xFF4AB5;unsigned long btn_9 = 0xFF52AD;
-
-
-int led_red = 11;
-int led_green = 10;
-int led_blue = 9;
-
-
+unsigned long btn_minus = 0xFFE01F; unsigned long btn_plus = 0xFFA857;		unsigned long btn_eq = 0xFF906F;
+unsigned long btn_0 = 0xFF30CF;     unsigned long btn_100_plus = 0xFF9867;	unsigned long btn_200_plus = 0xFFB04F;
+unsigned long btn_1 = 0xFF30CF;		unsigned long btn_2 = 0xFF18E7;			unsigned long btn_3 = 0xFF7A85;
+unsigned long btn_4 = 0xFF10EF;		unsigned long btn_5 = 0xFF38C7;			unsigned long btn_6 = 0xFF5AA5;
+unsigned long btn_7 = 0xFF42BD;		unsigned long btn_8 = 0xFF4AB5;			unsigned long btn_9 = 0xFF52AD;
 
 LiquidCrystal_I2C lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 
@@ -202,12 +194,10 @@ void decodeRemote()
 	 
  }
  else if(results.value == btn_5) // pressed 5
-      {
-      digitalWrite(led_red, LOW);    
-      digitalWrite(led_blue, LOW);    
-      digitalWrite(led_green, LOW);    
-      }
-else if(results.value == btn_6) // pressed 5
+ {
+ 
+ }
+ else if(results.value == btn_6) // pressed 5
       {
 		alarmNoise();  
       }
@@ -243,7 +233,6 @@ void setup()
 { 
   alarmOn(); alarmSet(6,0,0); // default alarm at 6 am 
   Wire.begin(); rtc.begin();
-  pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT); 
   pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
   screenOn = false;							   // when starting, make LED backlight off 
   dht.begin();                                 // set up temp monitor 
