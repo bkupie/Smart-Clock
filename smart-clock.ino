@@ -109,7 +109,7 @@ void alarmNoise()
 	  lcd.setBacklight(HIGH); // just incase the screen is turned off, which it should be 
 	  lcd.setCursor(0,0);lcd.print("+-----------------+");
 	  lcd.setCursor(0,1);lcd.print("|     WAKE UP     |");
-	  lcd.setCursor(0,2);lcd.print("|   IT'S  "); lcd.print(alarm.hour); lcd.print(":");lcd.print(alarm.minute);lcd.print("   |");
+	  lcd.setCursor(0,2);lcd.print("|   IT'S  "); lcd.print(alarm.hour,DEC); lcd.print(":");lcd.print(alarm.minute, DEC);lcd.print("   |");
 	  lcd.setCursor(0,3);lcd.print("+-----------------+");
         analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
 		delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
@@ -139,7 +139,9 @@ void displayTime() // display the time and date on the LCD screen
 	   {
 			alarmNoise();
 	   }
-	  lcd.clear();
+	  if(now.second() == 0) // if we went to the next miute ... 
+		  lcd.clear(); 		// clear screen 
+		  
 	  // print the current date:
 	  lcd.setCursor(0,0);lcd.print("Date  : "); lcd.print(now.month(), DEC);lcd.print('/');lcd.print(now.date(), DEC);lcd.print('/');lcd.print(now.year(), DEC);
 	  // print the current time:
@@ -251,7 +253,7 @@ void setup()
   while (!Serial);                             //delay for serial
   irrecv.enableIRIn();                         // Start the receiver
   Serial.begin(9600);                          // Begin serial communcation, used for input 
-  analogWrite(BUZZERPIN,50);delay(999);analogWrite(BUZZERPIN,0); // indicate to user that we  are ready 
+  analogWrite(BUZZERPIN,50);delay(50);analogWrite(BUZZERPIN,0); // indicate to user that we  are ready 
 }
 
 void loop()
