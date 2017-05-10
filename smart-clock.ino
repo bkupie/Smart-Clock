@@ -122,11 +122,13 @@ void displayTime() // display the time and date on the LCD screen
 	   }
 	  lcd.clear();
 	  // print the current date:
-	  lcd.setCursor(0,0);lcd.print("Date: ");lcd.print(now.month(), DEC);lcd.print('/');lcd.print(now.date(), DEC);lcd.print('/');lcd.print(now.year(), DEC);
+	  lcd.setCursor(0,0);lcd.print("Date  : "); lcd.print(now.month(), DEC);lcd.print('/');lcd.print(now.date(), DEC);lcd.print('/');lcd.print(now.year(), DEC);
 	  // print the current time:
-	  lcd.setCursor(0,1);lcd.print("Time: ");lcd.print(now.hour(), DEC);lcd.print(':');lcd.print(now.minute(), DEC);lcd.print(':');lcd.print(now.second(), DEC);
+	  lcd.setCursor(0,1);lcd.print("Time  : "); lcd.print(now.hour(), DEC);lcd.print(':');lcd.print(now.minute(), DEC);lcd.print(':');lcd.print(now.second(), DEC);
 	  // print the day of the week:
-	  lcd.setCursor(0,2);lcd.print("Day : "); lcd.print(weekDay[now.dayOfWeek()]);
+	  lcd.setCursor(0,2);lcd.print("Day   : "); lcd.print(weekDay[now.dayOfWeek()]);
+	  // print the day of the week:
+	  lcd.setCursor(0,3);lcd.print("Alarm : "); lcd.print(alarm.hour); lcd.print(":");lcd.print(alarm.minute);lcd.print(':');lcd.print(alarm.second);
   }
   delay(50);
 }
@@ -218,7 +220,7 @@ void getRemoteInput()
 
 void setup()
 { 
-  alarm.on = true; alarm.hour = 19; alarm.minute = 50; alarm.second = 00;
+  alarm.on = true; alarm.hour = 6; alarm.minute = 00; alarm.second = 00;
   Wire.begin(); rtc.begin();
   pinMode(led_red, OUTPUT);pinMode(led_green, OUTPUT);pinMode(led_blue, OUTPUT); 
   pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
