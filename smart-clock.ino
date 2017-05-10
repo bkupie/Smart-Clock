@@ -63,9 +63,13 @@ struct myAlarm alarm;
 
 
 //Hex values for remote
+
+unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;unsigned long btn_eq = 0xFF906F
+unsigned long btn_0 = 0xFF30CF;unsigned long btn_100_plus = 0xFF9867;unsigned long btn_200_plus = 0xFFB04F;
 unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
 unsigned long btn_4 = 0xFF10EF;unsigned long btn_5 = 0xFF38C7;unsigned long btn_6 = 0xFF5AA5;
-unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;
+unsigned long btn_7 = 0xFF42BD;unsigned long btn_8 = 0xFF4AB5;unsigned long btn_9 = 0xFF52AD;
+
 
 int led_red = 11;
 int led_green = 10;
@@ -114,9 +118,12 @@ void alarmNoise()
 		lcd.setBacklight(LOW);		
 }
 
-void timeSet(int year, int month,int day, int hr, int min, int sec, int day)
+//writing any non-existent time-data may interfere with normal operation of the RTC.
+//Take care of week-day also.
+//year, month, date, hour, min, sec and week-day(starts from 0 and goes to 6)
+void timeSet(int y, int m,int d,int h,int min, int s, int wd)
 {
-	DateTime newTime(year,month,day,hour,min,sec,day);  // make variable to store the time 
+	DateTime newTime(y,m,d,h,min,s,wd);  // make variable to store the time 
 	rtc.setDateTime(newTime); 							// adjust date-time as defined 'newTime' above 
 }
 
@@ -130,7 +137,7 @@ void displayTime() // display the time and date on the LCD screen
 	  old_ts = ts;
 	   if (alarm.hour == now.hour() && alarm.minute == now.minute() && alarm.second == now.second() )
 	   {
-		alarmNoise();
+			alarmNoise();
 	   }
 	  lcd.clear();
 	  // print the current date:
@@ -223,9 +230,9 @@ void getRemoteInput()
 {
    if (irrecv.decode(&results)) {
    lcd.clear();    // clear screen 
-   // lcd.print(results.value,HEX); // print out the code . . .
-   // delay(4000); 					// then delay to find out the values, DEBUG ONLY 
-   decodeRemote(); // decode output 
+   //lcd.print(results.value,HEX); // print out the code . . .
+   //delay(100); 	    // then delay to find out the values, DEBUG ONLY 
+   decodeRemote();  // decode output 
    irrecv.resume(); // Receive the next value
   }
 }
@@ -244,12 +251,13 @@ void setup()
   while (!Serial);                             //delay for serial
   irrecv.enableIRIn();                         // Start the receiver
   Serial.begin(9600);                          // Begin serial communcation, used for input 
+  analogWrite(BUZZERPIN,50);delay(999);analogWrite(BUZZERPIN,0); // indicate to user that we  are ready 
 }
 
 void loop()
 {
   getRemoteInput();
   //screenTimer();
-  displayTime();
+ // displayTime();
 }
 
