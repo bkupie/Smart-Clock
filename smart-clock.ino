@@ -64,7 +64,7 @@ struct myAlarm alarm;
 
 //Hex values for remote
 
-unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;unsigned long btn_eq = 0xFF906F
+unsigned long btn_minus = 0xFFE01F;unsigned long btn_plus = 0xFFA857;unsigned long btn_eq = 0xFF906F;
 unsigned long btn_0 = 0xFF30CF;unsigned long btn_100_plus = 0xFF9867;unsigned long btn_200_plus = 0xFFB04F;
 unsigned long btn_1 = 0xFF30CF;unsigned long btn_2 = 0xFF18E7;unsigned long btn_3 = 0xFF7A85;
 unsigned long btn_4 = 0xFF10EF;unsigned long btn_5 = 0xFF38C7;unsigned long btn_6 = 0xFF5AA5;
