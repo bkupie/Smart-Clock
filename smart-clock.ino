@@ -95,19 +95,28 @@ void alarmSet(int hr,int min,int sec)
 void alarmOn()  { alarm.on = true;  }
 void alarmOff() { alarm.on = false; }
 
-void alarmNoise()
-{
+void alarmDisplay(){
 	  lcd.clear();
 	  lcd.setBacklight(HIGH); // just incase the screen is turned off, which it should be 
 	  lcd.setCursor(0,0);lcd.print("+-----------------+");
 	  lcd.setCursor(0,1);lcd.print("|     WAKE UP     |");
 	  lcd.setCursor(0,2);lcd.print("|   IT'S  "); lcd.print(alarm.hour,DEC); lcd.print(":");lcd.print(alarm.minute, DEC);lcd.print("   |");
 	  lcd.setCursor(0,3);lcd.print("+-----------------+");
-        analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
-		delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
-		delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
-		delay(1000);
-		lcd.setBacklight(LOW);		
+}
+
+void alarmSound(){
+	analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
+	delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
+	delay(1000);analogWrite(BUZZERPIN,50);delay(1000);analogWrite(BUZZERPIN,0);
+	delay(1000);
+}
+
+
+void alarmGoOff()
+{
+	alarmDisplay();	
+	alarmSound();
+	lcd.setBacklight(LOW);		
 }
 
 //writing any non-existent time-data may interfere with normal operation of the RTC.
@@ -119,7 +128,7 @@ void timeSet(int y, int m,int d,int h,int min, int s, int wd)
 	rtc.setDateTime(newTime); 							// adjust date-time as defined 'newTime' above 
 }
 
-void displayTime() // display the time and date on the LCD screen 
+void timeDisplay() // display the time and date on the LCD screen 
 {
 
   DateTime now = rtc.now(); //get the current date-time
@@ -128,9 +137,7 @@ void displayTime() // display the time and date on the LCD screen
   if (old_ts == 0 || old_ts != ts) {
 	  old_ts = ts;
 	   if (alarm.hour == now.hour() && alarm.minute == now.minute() && alarm.second == now.second() )
-	   {
-			alarmNoise();
-	   }
+	   {alarmGoOff();}
 	  if(now.second() == 0) // if we went to the next miute ... 
 		  lcd.clear(); 		// clear screen 
 		  
@@ -171,7 +178,7 @@ void decodeRemote()
 	while(screenOn)
 	{
 		screenTimer();
-		displayTime();
+		timeDisplay();
 	}
 	}	
  else if(results.value == btn_2) // pressed 2
@@ -187,7 +194,7 @@ void decodeRemote()
 	}	
  else if(results.value == btn_3) // pressed 3
 	  {
-		  alarmNoise();
+		  alarmGoOff();
 	  }
  else if(results.value == btn_4) // pressed 4
  {
@@ -199,7 +206,7 @@ void decodeRemote()
  }
  else if(results.value == btn_6) // pressed 5
       {
-		alarmNoise();  
+		alarmGoOff();  
       }
  else if(results.value == btn_minus) // pressed - 
 	{  
@@ -220,22 +227,26 @@ void decodeRemote()
 
 void getRemoteInput()
 {
-   if (irrecv.decode(&results)) {
-   lcd.clear();    // clear screen 
-   //lcd.print(results.value,HEX); // print out the code . . .
-   //delay(100); 	    // then delay to find out the values, DEBUG ONLY 
-   decodeRemote();  // decode output 
-   irrecv.resume(); // Receive the next value
-  }
+   if (irrecv.decode(&results)) 
+   {
+	   lcd.clear();    				   // clear screen 
+	   // print out the code . . . then delay to find out the values, DEBUG ONLY 
+	   //lcd.print(results.value,HEX); delay(10000);
+	   decodeRemote();  // decode output 
+	   irrecv.resume(); // Receive the next value
+    }
 }
+
+
+
 
 void setup()
 { 
-  alarmOn(); alarmSet(6,0,0); // default alarm at 6 am 
   Wire.begin(); rtc.begin();
+  dht.begin();                                 // set up temp monitor 
+  alarmOn(); alarmSet(6,0,0); 				   // default alarm at 6 am 
   pinMode(BUZZERPIN,OUTPUT);				   // set buzzer as output 
   screenOn = false;							   // when starting, make LED backlight off 
-  dht.begin();                                 // set up temp monitor 
   lcd.begin (20,4,LCD_5x8DOTS);                // set up LCD  
   lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // set up backlight pin
   lcd.setBacklight(LOW);  lcd.home ();        // turn off LED screen, and set to home 
@@ -248,7 +259,7 @@ void setup()
 void loop()
 {
   getRemoteInput();
-  //screenTimer();
- // displayTime();
+  screenTimer();
+ // timeDisplay();
 }
 
